@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Light/dark aware: the background tile switches to a lighter green in dark mode -->
+  <style>
+    .bg { fill: #1f883d; }
+    @media (prefers-color-scheme: dark) { .bg { fill: #238636; } }
+  </style>
+  <rect class="bg" x="2" y="2" width="60" height="60" rx="12" />
+  <!-- 2x2 grid of rounded squares -->
+  <g fill="none" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">
+    <rect x="12" y="12" width="17" height="17" rx="3.5" />
+    <rect x="35" y="12" width="17" height="17" rx="3.5" />
+    <rect x="12" y="35" width="17" height="17" rx="3.5" />
+    <rect x="35" y="35" width="17" height="17" rx="3.5" />
+  </g>
+</svg>
