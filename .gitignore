@@ -7,3 +7,4 @@ Thumbs.db
 .env
 *.pfx
 *.p12
+_site/
