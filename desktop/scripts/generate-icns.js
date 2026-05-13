@@ -11,7 +11,7 @@ const path = require('path')
 const os   = require('os')
 
 async function main() {
-  const svgPath  = path.join(__dirname, '..', '..', 'favicon.svg')
+  const svgPath  = path.join(__dirname, '..', 'public', 'favicon.svg')
   const svgData  = fs.readFileSync(svgPath, 'utf8')
   const iconset  = path.join(os.tmpdir(), 'AppIcon.iconset')
   const outPath  = path.join(__dirname, '..', 'public', 'icon.icns')

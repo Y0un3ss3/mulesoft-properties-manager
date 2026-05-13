@@ -33,7 +33,7 @@ async function main() {
 
   const pngToIco = require('png-to-ico')
 
-  const svgPath = path.join(__dirname, '..', '..', 'favicon.svg')
+  const svgPath = path.join(__dirname, '..', 'public', 'favicon.svg')
   const svgData = fs.readFileSync(svgPath, 'utf8')
   const outDir  = path.join(__dirname, '..', 'public')
   fs.mkdirSync(outDir, { recursive: true })
