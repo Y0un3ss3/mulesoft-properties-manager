@@ -30,7 +30,7 @@ cd web
 npx serve .
 ```
 
-**Live:** [mpm.tools.unes.me](https://mpm.tools.unes.me)
+**Live:** [mpm.tools.unes.me/web](https://mpm.tools.unes.me/web)
 
 ## Desktop App
 
@@ -47,7 +47,7 @@ npm run build     # Build for current platform
 
 The docs site is a static landing page deployed alongside the web app.
 
-**Live:** [mpm.tools.unes.me/docs](https://mpm.tools.unes.me/docs)
+**Live:** [mpm.tools.unes.me](https://mpm.tools.unes.me)
 
 ## Development
 
@@ -81,8 +81,8 @@ npx serve .
 ### Web App & Docs
 
 Deployed automatically to GitHub Pages on push to `main`:
-- Web app: `mpm.tools.unes.me`
-- Docs: `mpm.tools.unes.me/docs`
+- Docs/Landing: `mpm.tools.unes.me`
+- Web app: `mpm.tools.unes.me/web`
 
 ### Desktop App
 

@@ -24,21 +24,21 @@ jobs:
         run: |
           mkdir -p _site
 
-          # Web app at root
-          cp web/index.html _site/index.html
-          cp web/styles.css _site/styles.css
-          cp web/app.js _site/app.js
-          cp web/crypto-js.min.js _site/crypto-js.min.js
-          cp web/favicon.svg _site/favicon.svg
-
-          # Docs at /docs (mpm.tools.unes.me/docs)
-          mkdir -p _site/docs
-          cp docs/index.html _site/docs/index.html
-          cp docs/style.css _site/docs/style.css
-          cp docs/favicon.svg _site/docs/favicon.svg
+          # Docs at root (mpm.tools.unes.me)
+          cp docs/index.html _site/index.html
+          cp docs/style.css _site/style.css
+          cp docs/favicon.svg _site/favicon.svg
           if [ -d docs/screenshots ]; then
-            cp -r docs/screenshots _site/docs/screenshots
+            cp -r docs/screenshots _site/screenshots
           fi
+
+          # Web app at /web (mpm.tools.unes.me/web)
+          mkdir -p _site/web
+          cp web/index.html _site/web/index.html
+          cp web/styles.css _site/web/styles.css
+          cp web/app.js _site/web/app.js
+          cp web/crypto-js.min.js _site/web/crypto-js.min.js
+          cp web/favicon.svg _site/web/favicon.svg
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
