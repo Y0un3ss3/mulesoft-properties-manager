@@ -36,9 +36,12 @@ jobs:
         shell: pwsh
         run: |
           $version = (Get-Content package.json | ConvertFrom-Json).version
-          $exe = Get-ChildItem release/*.exe | Select-Object -First 1
-          if ($exe) {
-            Rename-Item $exe.FullName "mpm-$version-windows.exe"
+          $expected = "release\mpm-$version-windows.exe"
+          if (-not (Test-Path $expected)) {
+            $exe = Get-ChildItem release/*.exe | Select-Object -First 1
+            if ($exe) {
+              Rename-Item $exe.FullName "mpm-$version-windows.exe"
+            }
           }
 
       - name: Upload Windows artifact
@@ -79,9 +82,12 @@ jobs:
       - name: Rename artifact
         run: |
           version=$(node -p "require('./package.json').version")
-          dmg=$(find release -name "*.dmg" | head -1)
-          if [ -n "$dmg" ]; then
-            mv "$dmg" "release/mpm-${version}-macos.dmg"
+          expected="release/mpm-${version}-macos.dmg"
+          if [ ! -f "$expected" ]; then
+            dmg=$(find release -name "*.dmg" | head -1)
+            if [ -n "$dmg" ]; then
+              mv "$dmg" "$expected"
+            fi
           fi
 
       - name: Upload macOS artifact
@@ -128,9 +134,12 @@ jobs:
       - name: Rename artifact
         run: |
           version=$(node -p "require('./package.json').version")
-          appimage=$(find release -name "*.AppImage" | head -1)
-          if [ -n "$appimage" ]; then
-            mv "$appimage" "release/mpm-${version}-linux.AppImage"
+          expected="release/mpm-${version}-linux.AppImage"
+          if [ ! -f "$expected" ]; then
+            appimage=$(find release -name "*.AppImage" | head -1)
+            if [ -n "$appimage" ]; then
+              mv "$appimage" "$expected"
+            fi
           fi
 
       - name: Upload Linux artifact
