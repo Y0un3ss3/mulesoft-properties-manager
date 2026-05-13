@@ -497,7 +497,7 @@ input[readonly], textarea[readonly] {
 .footer {
   border-top: 1px solid var(--border-default);
   color: var(--fg-muted);
-  padding: 16px 0;
+  padding: 8px 0;
   margin-top: 24px;
 }
 
@@ -505,6 +505,7 @@ input[readonly], textarea[readonly] {
 
 .footer .container small {
   display: block;
+  font-size: 11px;
 }
 
 .footer-author {
