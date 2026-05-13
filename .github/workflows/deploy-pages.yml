@@ -40,6 +40,10 @@ jobs:
           cp web/crypto-js.min.js _site/web/crypto-js.min.js
           cp web/favicon.svg _site/web/favicon.svg
 
+          # SEO files at root
+          cp robots.txt _site/robots.txt
+          cp sitemap.xml _site/sitemap.xml
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
