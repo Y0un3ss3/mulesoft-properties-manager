@@ -60,8 +60,11 @@
         and a lightweight <strong>CLI-free workflow</strong>. Everything runs locally — your keys and values never leave your machine.
       </p>
       <div class="hero-actions">
-        <a href="/web" class="btn btn-primary">Try the Web Tool</a>
-        <a href="https://github.com/Y0un3ss3/mulesoft-properties-manager/releases/latest" class="btn" id="downloadBtn">Download Desktop App</a>
+        <a href="/web" class="btn btn-primary hero-btn-glow">Try the Web Tool</a>
+        <div class="download-dropdown" id="downloadDropdown">
+          <a href="https://github.com/Y0un3ss3/mulesoft-properties-manager/releases/latest" class="btn" id="downloadBtn">Download Desktop App</a>
+          <p class="download-alt" id="downloadAlt">Also available for <a href="https://github.com/Y0un3ss3/mulesoft-properties-manager/releases/latest" id="altPlatform1">macOS</a> · <a href="https://github.com/Y0un3ss3/mulesoft-properties-manager/releases/latest" id="altPlatform2">Linux</a></p>
+        </div>
       </div>
     </div>
   </section>
@@ -202,15 +205,33 @@
     // Dynamic download button based on user platform
     (function () {
       var btn = document.getElementById('downloadBtn');
+      var alt = document.getElementById('downloadAlt');
+      var alt1 = document.getElementById('altPlatform1');
+      var alt2 = document.getElementById('altPlatform2');
       if (!btn) return;
+
       var ua = navigator.userAgent || navigator.platform || '';
+      var icon = '';
+      var label = 'Download Desktop App';
+      var others = ['macOS', 'Linux'];
+
       if (/Win/i.test(ua)) {
-        btn.textContent = 'Download for Windows';
+        icon = '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>';
+        label = 'Download for Windows';
+        others = ['macOS', 'Linux'];
       } else if (/Mac/i.test(ua)) {
-        btn.textContent = 'Download for macOS';
+        icon = '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>';
+        label = 'Download for macOS';
+        others = ['Windows', 'Linux'];
       } else if (/Linux/i.test(ua)) {
-        btn.textContent = 'Download for Linux';
+        icon = '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.581 19.049c-.55-.446-.336-1.431-.907-1.917.553-3.365-.997-6.331-2.845-8.232-1.551-1.595-1.639-3.743-1.408-5.155.076-.46-.263-.826-.672-.702-.956.29-2.06 1.042-2.674 2.755-.228.637-.581 1.193-.874 1.834-.911-1.548-2.354-2.597-3.826-2.597-2.098 0-3.711 1.889-3.711 4.5 0 1.463.6 2.812 1.538 3.727-.443.963-.734 2.043-.734 3.238 0 .59.057 1.16.155 1.7-.574.236-.94.792-.94 1.394 0 .828.672 1.5 1.5 1.5.166 0 .324-.029.475-.08.396.546.903.98 1.478 1.262-.18.334-.283.714-.283 1.118 0 1.312 1.066 2.376 2.381 2.376.87 0 1.628-.468 2.04-1.163.36.085.737.133 1.126.133.388 0 .766-.048 1.126-.133.412.695 1.17 1.163 2.04 1.163 1.315 0 2.381-1.064 2.381-2.376 0-.404-.103-.784-.283-1.118.575-.282 1.082-.716 1.478-1.262.151.051.309.08.475.08.828 0 1.5-.672 1.5-1.5 0-.602-.366-1.158-.94-1.394z"/></svg>';
+        label = 'Download for Linux';
+        others = ['Windows', 'macOS'];
       }
+
+      btn.innerHTML = '<span>' + label + '</span>' + icon;
+      if (alt1) alt1.textContent = others[0];
+      if (alt2) alt2.textContent = others[1];
     })();
   </script>
 </body>
