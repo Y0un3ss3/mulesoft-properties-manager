@@ -61,7 +61,7 @@
       </p>
       <div class="hero-actions">
         <a href="/web" class="btn btn-primary">Try the Web Tool</a>
-        <a href="#download" class="btn">Download Desktop App</a>
+        <a href="https://github.com/Y0un3ss3/mulesoft-properties-manager/releases/latest" class="btn" id="downloadBtn">Download Desktop App</a>
       </div>
     </div>
   </section>
@@ -114,56 +114,6 @@
           </div>
           <h3>100% Local</h3>
           <p>All cryptographic operations happen in your browser or on your machine. Nothing is ever sent to a server.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       WEB TOOL (EMBEDDED)
-       ═══════════════════════════════════════════════════════════════════════ -->
-  <section class="section" id="web-tool">
-    <div class="container">
-      <h2 class="section-title">Try the Web Tool</h2>
-      <p class="section-desc">Use the full tool right here — no install required.</p>
-      <div class="embed-frame">
-        <iframe src="/web/index.html" title="MuleSoft Properties Manager Web Tool" loading="lazy"></iframe>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       DOWNLOAD
-       ═══════════════════════════════════════════════════════════════════════ -->
-  <section class="section section-alt" id="download">
-    <div class="container">
-      <h2 class="section-title">Download Desktop App</h2>
-      <p class="section-desc">Native app for Windows, macOS, and Linux. Works offline.</p>
-
-      <div class="download-grid">
-        <div class="download-card">
-          <div class="download-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.001 5.479A11.092 11.092 0 0 1 11.5 2.019v9.48H3.001V5.48Zm0 8.021v6.019A11.09 11.09 0 0 0 11.5 22.48v-8.98H3.001Zm9.499 8.98a11.09 11.09 0 0 0 8.499-2.961V11.5H12.5v11.98ZM21 10.5V5.479A11.09 11.09 0 0 0 12.5 2.019V10.5H21Z"/></svg>
-          </div>
-          <h3>Windows</h3>
-          <p>Portable .exe — no install needed</p>
-          <a href="https://github.com/Y0un3ss3/mulesoft-properties-manager/releases/latest" class="btn btn-primary btn-sm">Download .exe</a>
-        </div>
-        <div class="download-card">
-          <div class="download-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2Zm0 1.5a8.5 8.5 0 1 1 0 17 8.5 8.5 0 0 1 0-17Zm-1.25 4a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5Zm2.5 0a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5ZM12 11.5c-2.21 0-4 1.343-4 3s1.79 3 4 3 4-1.343 4-3-1.79-3-4-3Z"/></svg>
-          </div>
-          <h3>macOS</h3>
-          <p>Apple Silicon .dmg</p>
-          <a href="https://github.com/Y0un3ss3/mulesoft-properties-manager/releases/latest" class="btn btn-primary btn-sm">Download .dmg</a>
-        </div>
-        <div class="download-card">
-          <div class="download-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.504 2a5.31 5.31 0 0 0-1.278.136c-.503.13-.93.354-1.26.636a2.332 2.332 0 0 0-.672.96c-.14.37-.194.77-.194 1.18v.088c0 .41.054.81.194 1.18.14.37.36.69.672.96.33.282.757.506 1.26.636.503.13 1.06.17 1.638.1a4.2 4.2 0 0 0 1.5-.44c.44-.22.81-.52 1.08-.88.27-.36.42-.78.42-1.22v-.848c0-.44-.15-.86-.42-1.22a3.18 3.18 0 0 0-1.08-.88 4.2 4.2 0 0 0-1.5-.44 5.31 5.31 0 0 0-.36-.148ZM12 7.5c-5.523 0-10 3.134-10 7s4.477 7 10 7 10-3.134 10-7-4.477-7-10-7Z"/></svg>
-          </div>
-          <h3>Linux</h3>
-          <p>AppImage — run on any distro</p>
-          <a href="https://github.com/Y0un3ss3/mulesoft-properties-manager/releases/latest" class="btn btn-primary btn-sm">Download .AppImage</a>
         </div>
       </div>
     </div>
@@ -248,6 +198,20 @@
       document.documentElement.setAttribute('data-theme', next);
       try { localStorage.setItem('theme', next); } catch (e) {}
     });
+
+    // Dynamic download button based on user platform
+    (function () {
+      var btn = document.getElementById('downloadBtn');
+      if (!btn) return;
+      var ua = navigator.userAgent || navigator.platform || '';
+      if (/Win/i.test(ua)) {
+        btn.textContent = 'Download for Windows';
+      } else if (/Mac/i.test(ua)) {
+        btn.textContent = 'Download for macOS';
+      } else if (/Linux/i.test(ua)) {
+        btn.textContent = 'Download for Linux';
+      }
+    })();
   </script>
 </body>
 </html>
