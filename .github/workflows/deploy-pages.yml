@@ -24,10 +24,7 @@ jobs:
         run: |
           mkdir -p _site
 
-          # Custom domain
-          cp CNAME _site/CNAME
-
-          # Web app at root (mpm.tools.unes.me)
+          # Web app at root
           cp web/index.html _site/index.html
           cp web/styles.css _site/styles.css
           cp web/app.js _site/app.js
