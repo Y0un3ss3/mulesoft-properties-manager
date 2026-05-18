@@ -144,12 +144,61 @@ export function transformFile(content, format, algo, mode, key, op, options = {}
   const separator = format === 'yaml'
     ? /^(\s*)([^:#\s][^:]*?)\s*:\s*(.*)$/
     : /^(\s*)([^=:#\s][^=:]*?)\s*([=:])\s*(.*)$/
+  const seqItemRe = /^(\s*-\s?)(.+)$/
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]
     if (!line.trim() || /^\s*[#!]/.test(line)) { out[i] = line; continue }
 
     const m = line.match(separator)
+
+    // YAML sequence items: "  - value"
+    if (!m && format === 'yaml') {
+      const seqMatch = line.match(seqItemRe)
+      if (seqMatch) {
+        const prefix = seqMatch[1]
+        let value = seqMatch[2]
+
+        // Strip trailing inline comment
+        let trailing = ''
+        const hashIdx = findUnquotedHash(value)
+        if (hashIdx >= 0) {
+          trailing = value.slice(hashIdx)
+          value = value.slice(0, hashIdx).replace(/\s+$/, '')
+        }
+
+        // Unwrap quotes
+        let quote = ''
+        if (value.length >= 2) {
+          const first = value[0], last = value[value.length - 1]
+          if ((first === '"' && last === '"') || (first === "'" && last === "'")) {
+            quote = first
+            value = value.slice(1, -1)
+          }
+        }
+
+        if (value === '') { out[i] = line; skipped++; continue }
+
+        try {
+          let newValue
+          if (op === 'encrypt') {
+            const encrypted = encrypt(algo, mode, key, unwrapSecure(value).value, options)
+            newValue = `![${encrypted}]`
+          } else {
+            const inner = unwrapSecure(value)
+            if (!inner.wrapped) { out[i] = line; skipped++; continue }
+            newValue = decrypt(algo, mode, key, inner.value, options)
+          }
+          const wrapped = quote ? `${quote}${newValue}${quote}` : newValue
+          out[i] = `${prefix}${wrapped}${trailing ? ' ' + trailing : ''}`
+          processed++
+        } catch (err) {
+          throw new Error(`Line ${i + 1}: ${err.message}`)
+        }
+        continue
+      }
+    }
+
     if (!m) { out[i] = line; continue }
 
     let prefix, rawValue
