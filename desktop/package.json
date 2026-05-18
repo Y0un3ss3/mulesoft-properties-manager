@@ -15,7 +15,7 @@
   "dependencies": {
     "crypto-js": "4.2.0",
     "highlight.js": "^11.10.0",
-    "js-yaml": "4.1.0",
+    "js-yaml": "4.1.1",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   },
@@ -23,11 +23,11 @@
     "@resvg/resvg-js": "^2.6.2",
     "@types/react": "18.3.1",
     "@types/react-dom": "18.3.1",
-    "@vitejs/plugin-react": "4.7.0",
+    "@vitejs/plugin-react": "6.0.2",
     "concurrently": "9.1.0",
     "cross-env": "^7.0.3",
     "electron": "39.8.5",
-    "electron-builder": "25.1.8",
+    "electron-builder": "26.8.1",
     "png-to-ico": "^2.1.8",
     "vite": "8.0.12",
     "wait-on": "8.0.1"
