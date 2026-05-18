@@ -82,6 +82,7 @@
   });
   $("clearFileBtn").addEventListener("click", clearFile);
   $("downloadBtn").addEventListener("click", downloadOutput);
+  $("previewBtn").addEventListener("click", openFilePreview);
 
   // Restore tab from URL hash (e.g. #inspect, #crypto/encrypt). Falls back
   // to defaults when the hash is empty or invalid.
@@ -251,6 +252,7 @@
     $("runFileBtn").disabled = !(hasKey && state.file);
     $("copyBtn").disabled = !hasOutput;
     $("downloadBtn").disabled = !hasFileOutput;
+    $("previewBtn").disabled = !hasFileOutput;
   }
 
   function onSubmit(e) {
@@ -1489,11 +1491,10 @@
     const title = $("valueDialogTitle");
     const eyebrow = $("valueDialogEyebrow");
     const meta = $("valueDialogMeta");
-    const body = $("valueDialogBody");
+    const detail = $("valueDialogDetail");
     const copyBtn = $("valueDialogCopy");
     $("valueDialogStatus").textContent = "";
     $("valueDialogStatus").className = "status";
-    body.classList.remove("missing");
 
     if (!env || td.classList.contains("key-col")) {
       // Clicked the key column — show the full property path
@@ -1505,34 +1506,61 @@
         ${row.different ? '<span class="pill encrypted">differs across envs</span>' : ""}
         ${row.anySecure ? '<span class="pill secure">secure</span>' : ""}
       `;
-      body.textContent = key;
+      detail.innerHTML = `
+        <div class="cell-detail-row">
+          <span class="cell-detail-label">Key</span>
+          <code class="cell-detail-value cell-detail-value-main">${escapeHtml(key)}</code>
+        </div>
+        <div class="cell-detail-row">
+          <span class="cell-detail-label">Environments</span>
+          <code class="cell-detail-value">${escapeHtml(inspector.results.envs.join(", "))}</code>
+        </div>
+      `;
       dialog.dataset.copy = key;
+      copyBtn.disabled = false;
     } else {
       const cell = row.cells[inspector.results.envs.indexOf(env)];
-      eyebrow.textContent = `Value · ${env}`;
+      eyebrow.textContent = "Cell value";
       title.textContent = key;
       const pills = [];
       if (cell && cell.missing) pills.push('<span class="pill missing">missing</span>');
       if (cell && cell.secure && !cell.encrypted) pills.push('<span class="pill secure">decrypted secret</span>');
-      if (cell && cell.encrypted) pills.push('<span class="pill encrypted">encrypted — no key</span>');
+      if (cell && cell.encrypted) pills.push('<span class="pill encrypted">encrypted \u2014 no key</span>');
       if (cell && cell.error) pills.push('<span class="pill error">decryption error</span>');
       if (cell && cell.sourceFile) pills.push(`<span class="pill">${escapeHtml(cell.sourceFile)}</span>`);
       meta.innerHTML = pills.join("");
 
-      if (!cell || cell.missing) {
-        body.classList.add("missing");
-        body.textContent = "(not defined in this environment)";
+      var displayValue = "";
+      var isMissing = !cell || cell.missing;
+
+      if (isMissing) {
+        displayValue = "(not defined in this environment)";
         dialog.dataset.copy = "";
         copyBtn.disabled = true;
       } else if (cell.error) {
-        body.textContent = `${cell.error}\n\nCiphertext: ${cell.value}`;
+        displayValue = cell.error + "\n\nCiphertext: " + cell.value;
         dialog.dataset.copy = cell.value;
         copyBtn.disabled = false;
       } else {
-        body.textContent = cell.value != null ? String(cell.value) : "";
-        dialog.dataset.copy = cell.value != null ? String(cell.value) : "";
+        displayValue = cell.value != null ? String(cell.value) : "";
+        dialog.dataset.copy = displayValue;
         copyBtn.disabled = false;
       }
+
+      detail.innerHTML = `
+        <div class="cell-detail-row">
+          <span class="cell-detail-label">Key</span>
+          <code class="cell-detail-value">${escapeHtml(key)}</code>
+        </div>
+        <div class="cell-detail-row">
+          <span class="cell-detail-label">Environment</span>
+          <code class="cell-detail-value">${escapeHtml(env)}</code>
+        </div>
+        <div class="cell-detail-row">
+          <span class="cell-detail-label">Value</span>
+          <code class="cell-detail-value${isMissing ? "" : " cell-detail-value-main"}">${escapeHtml(displayValue)}</code>
+        </div>
+      `;
     }
 
     if (typeof dialog.showModal === "function") dialog.showModal();
@@ -1542,19 +1570,16 @@
   async function copyDialogValue() {
     const text = $("valueDialog").dataset.copy || "";
     if (!text) return;
-    const status = $("valueDialogStatus");
+    const btn = $("valueDialogCopy");
+    const label = btn.querySelector("span");
     try {
       await navigator.clipboard.writeText(text);
-      status.className = "status visible ok";
-      status.innerHTML = `<svg class="icon"><use href="#i-check"/></svg><span>Copied to clipboard.</span>`;
+      label.textContent = "Copied!";
+      setTimeout(function () { label.textContent = "Copy"; }, 2000);
     } catch {
-      status.className = "status visible error";
-      status.innerHTML = `<svg class="icon"><use href="#i-exclamation-triangle"/></svg><span>Could not copy. Select the text above and press Ctrl+C.</span>`;
+      label.textContent = "Failed";
+      setTimeout(function () { label.textContent = "Copy"; }, 2000);
     }
-    setTimeout(() => {
-      status.textContent = "";
-      status.className = "status";
-    }, 2500);
   }
 
   function setInspectStatus(msg, kind) {
@@ -1571,4 +1596,173 @@
   }
 
   function escapeAttr(s) { return escapeHtml(s); }
+
+  // ==========================================================================
+  // Syntax Highlighter (YAML / .properties)
+  // ==========================================================================
+
+  function hlEsc(s) {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function tokeniseValue(raw) {
+    if (!raw) return "";
+
+    // Quoted string — may contain ![...] inside
+    var quoteMatch = raw.match(/^(['"])(.*)\1$/);
+    if (quoteMatch) {
+      var q = quoteMatch[1], inner = quoteMatch[2];
+      return (
+        '<span class="hl-string-quote">' + hlEsc(q) + "</span>" +
+        tokeniseValue(inner) +
+        '<span class="hl-string-quote">' + hlEsc(q) + "</span>"
+      );
+    }
+
+    // Encrypted value ![...]
+    var encMatch = raw.match(/^(!\[)(.*?)(\])(.*)$/);
+    if (encMatch) {
+      var open = encMatch[1], cipher = encMatch[2], close = encMatch[3], rest = encMatch[4];
+      return (
+        '<span class="hl-bracket">' + hlEsc(open) + "</span>" +
+        '<span class="hl-encrypted">' + hlEsc(cipher) + "</span>" +
+        '<span class="hl-bracket">' + hlEsc(close) + "</span>" +
+        (rest ? '<span class="hl-value">' + hlEsc(rest) + "</span>" : "")
+      );
+    }
+
+    // Boolean / null
+    if (/^(true|false|yes|no|null|~)$/i.test(raw.trim())) {
+      return '<span class="hl-boolean">' + hlEsc(raw) + "</span>";
+    }
+
+    // Number
+    if (/^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(raw.trim())) {
+      return '<span class="hl-number">' + hlEsc(raw) + "</span>";
+    }
+
+    return '<span class="hl-value">' + hlEsc(raw) + "</span>";
+  }
+
+  function highlightYamlLine(line) {
+    if (!line.trim()) return "";
+
+    // Comment
+    if (/^\s*#/.test(line)) {
+      return '<span class="hl-comment">' + hlEsc(line) + "</span>";
+    }
+
+    // Sequence item: "  - value"
+    var seqMatch = line.match(/^(\s*)(- ?)(.*)$/);
+    if (seqMatch && !seqMatch[3].includes(":")) {
+      return (
+        hlEsc(seqMatch[1]) +
+        '<span class="hl-punctuation">' + hlEsc(seqMatch[2]) + "</span>" +
+        tokeniseValue(seqMatch[3].trim())
+      );
+    }
+
+    // Key: value
+    var kvMatch = line.match(/^(\s*)([^:#\s][^:]*?)\s*:\s*(.*)$/);
+    if (kvMatch) {
+      var indent = kvMatch[1], key = kvMatch[2], value = kvMatch[3];
+
+      // Strip trailing inline comment
+      var val = value;
+      var trailingComment = "";
+      var hashIdx = val.search(/\s#/);
+      if (hashIdx >= 0 && !val.startsWith('"') && !val.startsWith("'")) {
+        trailingComment = val.slice(hashIdx);
+        val = val.slice(0, hashIdx);
+      }
+
+      return (
+        hlEsc(indent) +
+        '<span class="hl-key">' + hlEsc(key) + "</span>" +
+        '<span class="hl-separator">: </span>' +
+        tokeniseValue(val.trim()) +
+        (trailingComment ? '<span class="hl-comment">' + hlEsc(trailingComment) + "</span>" : "")
+      );
+    }
+
+    return hlEsc(line);
+  }
+
+  function highlightPropertiesLine(line) {
+    if (!line.trim()) return "";
+
+    // Comment (# or !)
+    if (/^\s*[#!]/.test(line)) {
+      return '<span class="hl-comment">' + hlEsc(line) + "</span>";
+    }
+
+    // key=value or key: value
+    var kvMatch = line.match(/^(\s*)([^=:\s][^=:]*?)\s*([=:])\s*(.*)$/);
+    if (kvMatch) {
+      return (
+        hlEsc(kvMatch[1]) +
+        '<span class="hl-key">' + hlEsc(kvMatch[2]) + "</span>" +
+        '<span class="hl-separator">' + hlEsc(kvMatch[3]) + "</span>" +
+        tokeniseValue(kvMatch[4])
+      );
+    }
+
+    return hlEsc(line);
+  }
+
+  function highlightContent(content, lang) {
+    var lines = content.split("\n");
+    var fn = lang === "yaml" ? highlightYamlLine : highlightPropertiesLine;
+    return lines.map(fn).join("\n");
+  }
+
+  // ==========================================================================
+  // File Preview Dialog
+  // ==========================================================================
+
+  $("fpClose").addEventListener("click", closeFilePreview);
+  $("fpDismiss").addEventListener("click", closeFilePreview);
+  $("fpCopy").addEventListener("click", copyFilePreview);
+  $("filePreviewDialog").addEventListener("click", function (e) {
+    if (e.target === $("filePreviewDialog")) closeFilePreview();
+  });
+
+  function openFilePreview() {
+    var content = $("fileOutput").value;
+    if (!content || !state.file) return;
+
+    var fileName = state.file.name;
+    var ext = (fileName.match(/\.([^.]+)$/) || ["", ""])[1].toLowerCase();
+    var lang = (ext === "yaml" || ext === "yml") ? "yaml" : "properties";
+    var lineCount = content.split("\n").length;
+
+    $("fpEyebrow").textContent = "Output preview \u00B7 " + lang.toUpperCase();
+    $("fpTitle").textContent = fileName;
+    $("fpMeta").innerHTML =
+      '<span class="pill">' + lineCount + " line" + (lineCount !== 1 ? "s" : "") + "</span>" +
+      '<span class="pill">' + formatBytes(new TextEncoder().encode(content).length) + "</span>";
+    $("fpBody").innerHTML = highlightContent(content, lang);
+
+    $("filePreviewDialog").dataset.copy = content;
+    $("filePreviewDialog").showModal();
+  }
+
+  function closeFilePreview() {
+    $("filePreviewDialog").close();
+  }
+
+  function copyFilePreview() {
+    var text = $("filePreviewDialog").dataset.copy || "";
+    if (!text) return;
+    var status = $("fpStatus");
+    navigator.clipboard.writeText(text).then(function () {
+      status.className = "status visible ok";
+      status.innerHTML = '<svg class="icon"><use href="#i-check"/></svg><span>Copied to clipboard.</span>';
+      setTimeout(function () { status.textContent = ""; status.className = "status"; }, 2500);
+    }).catch(function () {
+      status.className = "status visible error";
+      status.innerHTML = '<svg class="icon"><use href="#i-exclamation-triangle"/></svg><span>Could not copy.</span>';
+      setTimeout(function () { status.textContent = ""; status.className = "status"; }, 2500);
+    });
+  }
 })();

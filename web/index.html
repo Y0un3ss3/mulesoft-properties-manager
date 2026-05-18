@@ -275,10 +275,16 @@
           <div class="field">
             <div class="label-row">
               <label for="fileOutput">Output preview</label>
-              <button type="button" id="downloadBtn" class="btn btn-sm" disabled>
-                <svg class="icon"><use href="#i-arrow-down-tray"/></svg>
-                <span>Download</span>
-              </button>
+              <div class="file-output-actions">
+                <button type="button" id="downloadBtn" class="btn btn-sm" disabled>
+                  <svg class="icon"><use href="#i-arrow-down-tray"/></svg>
+                  <span>Download</span>
+                </button>
+                <button type="button" id="previewBtn" class="btn btn-sm" disabled>
+                  <svg class="icon"><use href="#i-arrows-expand"/></svg>
+                  <span>Preview</span>
+                </button>
+              </div>
             </div>
             <textarea id="fileOutput" rows="10" readonly placeholder="Processed file content appears here…"></textarea>
             <div id="fileStatus" class="status" role="status" aria-live="polite"></div>
@@ -444,7 +450,7 @@
           <svg class="icon"><use href="#i-x-mark"/></svg>
         </button>
       </header>
-      <pre id="valueDialogBody" class="value-dialog-body"></pre>
+      <div id="valueDialogDetail" class="cell-detail-meta"></div>
       <footer class="value-dialog-footer">
         <div id="valueDialogStatus" class="status" role="status" aria-live="polite"></div>
         <div class="value-dialog-actions">
@@ -453,6 +459,34 @@
             <span>Copy</span>
           </button>
           <button type="button" id="valueDialogDismiss" class="btn">Close</button>
+        </div>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="filePreviewDialog" class="value-dialog file-preview-dialog" aria-labelledby="fpTitle">
+    <form method="dialog" class="value-dialog-inner">
+      <header class="value-dialog-header">
+        <div>
+          <div class="value-dialog-eyebrow" id="fpEyebrow">Output preview</div>
+          <h3 id="fpTitle" class="value-dialog-title"></h3>
+          <div id="fpMeta" class="value-dialog-meta"></div>
+        </div>
+        <button type="button" id="fpClose" class="btn btn-icon" aria-label="Close">
+          <svg class="icon"><use href="#i-x-mark"/></svg>
+        </button>
+      </header>
+      <div class="file-preview-body">
+        <pre id="fpBody"></pre>
+      </div>
+      <footer class="value-dialog-footer">
+        <div id="fpStatus" class="status" role="status" aria-live="polite"></div>
+        <div class="value-dialog-actions">
+          <button type="button" id="fpCopy" class="btn btn-primary">
+            <svg class="icon"><use href="#i-clipboard"/></svg>
+            <span>Copy</span>
+          </button>
+          <button type="button" id="fpDismiss" class="btn">Close</button>
         </div>
       </footer>
     </form>
