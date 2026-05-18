@@ -1149,6 +1149,53 @@ body.inspect-fullscreen .inspect-table-wrap {
   font-style: italic;
 }
 
+/* Cell detail meta rows (key / env / value) in ValueDialog */
+.cell-detail-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-bottom: 1px solid var(--border-muted);
+  background: var(--canvas-subtle);
+}
+
+.cell-detail-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 5px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.cell-detail-row:last-child {
+  border-bottom: 0;
+}
+
+.cell-detail-label {
+  flex-shrink: 0;
+  width: 88px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fg-muted);
+}
+
+.cell-detail-value {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  color: var(--fg-default);
+  word-break: break-all;
+  background: transparent;
+  padding: 0;
+  border: 0;
+  white-space: pre-wrap;
+}
+
+.cell-detail-value-main {
+  color: var(--accent-fg);
+  font-weight: 500;
+}
+
 .value-dialog-footer {
   display: flex;
   align-items: center;
@@ -1179,3 +1226,53 @@ body.inspect-fullscreen .inspect-table-wrap {
 
 /* Preserve the plain-cursor for the reveal span itself — it's still a click target */
 .inspect-table .val-secret { cursor: pointer; }
+
+/* --- Syntax highlighting (file preview) --- */
+
+.file-preview-dialog .value-dialog-inner { max-height: calc(100vh - 64px); }
+
+.file-output-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.file-preview-body {
+  flex: 1;
+  overflow: auto;
+  padding: 14px 16px;
+  background: var(--canvas-default);
+  min-height: 0;
+}
+
+.file-preview-body pre {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 12.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Light theme */
+:root[data-theme="light"] .hl-comment      { color: #6a737d; font-style: italic; }
+:root[data-theme="light"] .hl-key          { color: #005cc5; font-weight: 600; }
+:root[data-theme="light"] .hl-separator    { color: #586069; }
+:root[data-theme="light"] .hl-value        { color: #032f62; }
+:root[data-theme="light"] .hl-string-quote { color: #586069; }
+:root[data-theme="light"] .hl-encrypted    { color: #e36209; font-style: italic; }
+:root[data-theme="light"] .hl-bracket      { color: #d73a49; font-weight: 600; }
+:root[data-theme="light"] .hl-number       { color: #005cc5; }
+:root[data-theme="light"] .hl-boolean      { color: #d73a49; }
+:root[data-theme="light"] .hl-punctuation  { color: #586069; }
+
+/* Dark theme */
+:root[data-theme="dark"] .hl-comment      { color: #6a737d; font-style: italic; }
+:root[data-theme="dark"] .hl-key          { color: #79b8ff; font-weight: 600; }
+:root[data-theme="dark"] .hl-separator    { color: #8b949e; }
+:root[data-theme="dark"] .hl-value        { color: #9ecbff; }
+:root[data-theme="dark"] .hl-string-quote { color: #8b949e; }
+:root[data-theme="dark"] .hl-encrypted    { color: #ffab70; font-style: italic; }
+:root[data-theme="dark"] .hl-bracket      { color: #f97583; font-weight: 600; }
+:root[data-theme="dark"] .hl-number       { color: #79b8ff; }
+:root[data-theme="dark"] .hl-boolean      { color: #f97583; }
+:root[data-theme="dark"] .hl-punctuation  { color: #8b949e; }
