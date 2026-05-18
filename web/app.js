@@ -1804,15 +1804,14 @@
   function copyFilePreview() {
     var text = $("filePreviewDialog").dataset.copy || "";
     if (!text) return;
-    var status = $("fpStatus");
+    var btn = $("fpCopy");
+    var label = btn.querySelector("span");
     navigator.clipboard.writeText(text).then(function () {
-      status.className = "status visible ok";
-      status.innerHTML = '<svg class="icon"><use href="#i-check"/></svg><span>Copied to clipboard.</span>';
-      setTimeout(function () { status.textContent = ""; status.className = "status"; }, 2500);
+      label.textContent = "Copied!";
+      setTimeout(function () { label.textContent = "Copy"; }, 2000);
     }).catch(function () {
-      status.className = "status visible error";
-      status.innerHTML = '<svg class="icon"><use href="#i-exclamation-triangle"/></svg><span>Could not copy.</span>';
-      setTimeout(function () { status.textContent = ""; status.className = "status"; }, 2500);
+      label.textContent = "Failed";
+      setTimeout(function () { label.textContent = "Copy"; }, 2000);
     });
   }
 })();
